@@ -1,9 +1,12 @@
 const express = require('express');
 const {userRoute} = require('../backend/userRoute');
 const { connection } = require('../backend/db');
+const cors = require("cors");
 
 
 const app = express();
+
+app.use(cors());
 app.use(express.json());
 
 

@@ -70,13 +70,16 @@ userRoute.post('/login',async(req,res)=>{
 userRoute.post('/forget-password',async(req,res)=>{
     try{
     const {email} = req.body;
-    const user = UserModel.findOne({email});
+    const user = await UserModel.findOne({email});
     if(user){
-       const otp = generateOtp();
+       let otp = generateOtp();
       await UserModel.updateOne({email},{$set : {otp}});
     }
+    else{
+        return res.status(400).json({msg : "User not found"});
+    }
     const mailOptions = {
-        from: "aniket357baghel@gmail.com",
+        from: "aniket35baghel@gmail.com",
         to: email,
         subject: "Otp verification",
         text: `Enter the otp to get validated : ${otp}`
@@ -94,22 +97,23 @@ userRoute.post('/forget-password',async(req,res)=>{
     })
     }
     catch(err){
+        console.log(err);
         res.status(500).send("internal server error");
     }
 })
 
 userRoute.post('/reset-password',async(req,res)=>{
     try{
-    const {email,otp,newpassword} = req.body;
+    const {email,otp,newPassword} = req.body;
     const user = await UserModel.findOne({email});
 
     if(user && user.otp === otp){
-        bcrypt.hash(newpassword, 5, async(err, hash)=> {
+        bcrypt.hash(newPassword, 5, async(err, hash)=> {
             if(err){
                 res.status(200).json({error : err});
             }
             else{
-               await UserModel.findByIdAndUpdate(user.id,{email,otp:null,newpassword:hash});
+               await UserModel.findByIdAndUpdate(user.id,{email,otp:null,newPassword:hash});
                res.status(200).json({msg: "password reset successfully"});
             }
         });
