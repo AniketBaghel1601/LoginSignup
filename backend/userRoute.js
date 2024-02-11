@@ -15,9 +15,13 @@ function generateOtp(){
 
 const transporter = nodemailer.createTransport({
     service : "gmail",
+    port : 465,
     auth : {
         user : "aniket357baghel@gmail.com",
-        password: "Anshul1234@"
+        pass: "vpuo imkz dtbg alzr"
+    },
+    tls: {
+        rejectUnauthorized: false // Ignore TLS certificate errors (not recommended for production)
     }
 })
 
@@ -71,15 +75,16 @@ userRoute.post('/forget-password',async(req,res)=>{
     try{
     const {email} = req.body;
     const user = await UserModel.findOne({email});
+    let otp = generateOtp();
     if(user){
-       let otp = generateOtp();
+       console.log(otp);
       await UserModel.updateOne({email},{$set : {otp}});
     }
     else{
         return res.status(400).json({msg : "User not found"});
     }
     const mailOptions = {
-        from: "aniket35baghel@gmail.com",
+        from: "aniket357baghel@gmail.com",
         to: email,
         subject: "Otp verification",
         text: `Enter the otp to get validated : ${otp}`
