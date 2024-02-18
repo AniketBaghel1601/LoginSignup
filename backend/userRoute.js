@@ -83,11 +83,14 @@ userRoute.post('/forget-password',async(req,res)=>{
     else{
         return res.status(400).json({msg : "User not found"});
     }
+    const token = jwt.sign({email},"Aniket",{expiresIn:"1h"});
+    const resetPassLink = `yourDomain.com/reset-password?token=${token}`;
     const mailOptions = {
         from: "aniket357baghel@gmail.com",
         to: email,
         subject: "Otp verification",
-        text: `Enter the otp to get validated : ${otp}`
+        text: `Enter the otp to get validated : ${otp}`,
+        html : `<p>Click<a href = "${resetPassLink}"></a>to continue</p>`
     }
 
     transporter.sendMail(mailOptions ,(err,info)=>{
